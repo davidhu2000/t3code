@@ -4666,13 +4666,15 @@ function ChatViewContent(props: ChatViewProps) {
       const modKey = isMacPlatform(navigator.platform)
         ? event.metaKey && !event.ctrlKey
         : event.ctrlKey && !event.metaKey;
+      const activeBrowserTabId =
+        activeRightPanelSurface?.kind === "preview" ? activeRightPanelSurface.resourceId : null;
       if (
         activeRightPanelSurface &&
         event.key.toLowerCase() === "w" &&
         modKey &&
         !event.altKey &&
         !event.shiftKey &&
-        isPreviewFocused()
+        isPreviewFocused(activeBrowserTabId)
       ) {
         event.preventDefault();
         event.stopPropagation();
