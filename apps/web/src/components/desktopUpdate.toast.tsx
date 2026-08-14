@@ -2,10 +2,12 @@ import type { DesktopBridge, DesktopUpdateState } from "@t3tools/contracts";
 import { ArrowRightIcon } from "lucide-react";
 
 import {
+  getDesktopUpdateActionError,
   getDesktopUpdateDownloadedVersion,
   getDesktopUpdateReleaseUrl,
+  shouldToastDesktopUpdateActionResult,
 } from "./desktopUpdate.logic";
-import { toastManager } from "./ui/toast";
+import { stackedThreadToast, toastManager } from "./ui/toast";
 
 type DesktopUpdateShell = Pick<DesktopBridge, "installUpdate" | "openExternal">;
 
@@ -52,13 +54,41 @@ export function showDesktopUpdateDownloadedToast(
     description: (
       <>
         Restart the app to install it.
-        {releaseUrl ? <ReleaseNotesLink releaseUrl={releaseUrl} shell={shell} /> : null}
+        {releaseUrl ? (
+          <>
+            {" "}
+            <ReleaseNotesLink releaseUrl={releaseUrl} shell={shell} />
+          </>
+        ) : null}
       </>
     ),
     actionProps: {
       children: "Restart",
       onClick: () => {
-        void shell.installUpdate();
+        void shell
+          .installUpdate()
+          .then((result) => {
+            if (!shouldToastDesktopUpdateActionResult(result)) return;
+            const actionError = getDesktopUpdateActionError(result);
+            if (!actionError) return;
+            toastManager.add(
+              stackedThreadToast({
+                type: "error",
+                title: "Could not install update",
+                description: actionError,
+              }),
+            );
+          })
+          .catch((error) => {
+            toastManager.add(
+              stackedThreadToast({
+                type: "error",
+                title: "Could not install update",
+                description:
+                  error instanceof Error ? error.message : "An unexpected error occurred.",
+              }),
+            );
+          });
       },
     },
   });
