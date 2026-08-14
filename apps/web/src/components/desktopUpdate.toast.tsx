@@ -7,7 +7,7 @@ import {
 } from "./desktopUpdate.logic";
 import { toastManager } from "./ui/toast";
 
-type DesktopUpdateShell = Pick<DesktopBridge, "openExternal">;
+type DesktopUpdateShell = Pick<DesktopBridge, "installUpdate" | "openExternal">;
 
 function ReleaseNotesLink({
   shell,
@@ -18,7 +18,7 @@ function ReleaseNotesLink({
 }) {
   return (
     <button
-      className="ml-2 inline cursor-pointer text-muted-foreground underline decoration-dotted underline-offset-4 transition-colors hover:text-foreground"
+      className="inline cursor-pointer text-muted-foreground underline decoration-dotted underline-offset-4 transition-colors hover:text-foreground"
       onClick={() => {
         void (async () => {
           try {
@@ -51,9 +51,15 @@ export function showDesktopUpdateDownloadedToast(
     title: "Update downloaded",
     description: (
       <>
-        Restart the app from the update button to install it.
+        Restart the app to install it.
         {releaseUrl ? <ReleaseNotesLink releaseUrl={releaseUrl} shell={shell} /> : null}
       </>
     ),
+    actionProps: {
+      children: "Restart",
+      onClick: () => {
+        void shell.installUpdate();
+      },
+    },
   });
 }
