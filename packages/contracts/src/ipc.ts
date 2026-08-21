@@ -1122,6 +1122,8 @@ export interface DesktopBridge {
     position?: { x: number; y: number },
   ) => Promise<T | null>;
   openExternal: (url: string) => Promise<boolean>;
+  /** Reveal a local file in Finder, Explorer, or the platform file manager. */
+  revealPath?: (path: string) => Promise<void>;
   /**
    * Probe this desktop machine for installed remote-capable editor CLIs
    * (used for remote open-in-editor deep links). Optional: older desktop
@@ -1251,6 +1253,7 @@ export interface LocalApi {
   };
   shell: {
     openExternal: (url: string) => Promise<void>;
+    revealPath?: (path: string) => Promise<void>;
   };
   contextMenu: {
     show: <T extends string>(
