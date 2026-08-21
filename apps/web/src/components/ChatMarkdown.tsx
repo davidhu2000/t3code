@@ -1258,8 +1258,8 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
     const revealPath = readLocalApi()?.shell.revealPath;
     if (!revealPath) return;
 
-    void revealPath(targetPath).catch((cause) => {
-      reportMarkdownActionFailure({ operation: "reveal-file", target: targetPath }, cause);
+    void revealPath(iconPath).catch((cause) => {
+      reportMarkdownActionFailure({ operation: "reveal-file", target: iconPath }, cause);
       toastManager.add(
         stackedThreadToast({
           type: "error",
@@ -1268,7 +1268,7 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
         }),
       );
     });
-  }, [targetPath]);
+  }, [iconPath]);
 
   const handleContextMenu = useCallback(
     async (event: ReactMouseEvent<HTMLAnchorElement>) => {
@@ -1422,6 +1422,9 @@ function ChatMarkdown({
   const environmentId = useActiveEnvironmentId();
   const primaryEnvironmentId = usePrimaryEnvironmentId();
   const serverConfig = useAtomValue(serverEnvironment.configValueAtom(environmentId));
+  const threadServerConfig = useAtomValue(
+    serverEnvironment.configValueAtom(threadRef?.environmentId ?? environmentId),
+  );
   const localPlatformOs =
     typeof navigator === "undefined"
       ? null
@@ -1433,7 +1436,7 @@ function ChatMarkdown({
   const canRevealInFileManager =
     threadRef !== undefined &&
     threadRef.environmentId === primaryEnvironmentId &&
-    serverConfig?.environment.platform.os === localPlatformOs &&
+    threadServerConfig?.environment.platform.os === localPlatformOs &&
     typeof window !== "undefined" &&
     window.desktopBridge?.revealPath !== undefined;
   const openInPreferredEditor = useOpenInPreferredEditor(
