@@ -85,10 +85,12 @@ export function HomeRouteScreen() {
         projects,
         environmentId: selectedEnvironmentId,
         projectGroupingMode: listOptions.projectGroupingMode,
-      }).map((scope) => ({
-        key: scope.key,
-        label: scope.title,
-      })),
+      })
+        .map((scope) => ({
+          key: scope.key,
+          label: scope.title,
+        }))
+        .toSorted((left, right) => left.label.localeCompare(right.label)),
     [listOptions.projectGroupingMode, projects, selectedEnvironmentId],
   );
   useEffect(() => {

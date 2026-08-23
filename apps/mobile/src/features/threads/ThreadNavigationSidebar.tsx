@@ -281,10 +281,12 @@ function ThreadNavigationSidebarPane(
   );
   const projectFilterOptions = useMemo(
     () =>
-      projectScopes.map((scope) => ({
-        key: scope.key,
-        label: scope.title,
-      })),
+      projectScopes
+        .map((scope) => ({
+          key: scope.key,
+          label: scope.title,
+        }))
+        .toSorted((left, right) => left.label.localeCompare(right.label)),
     [projectScopes],
   );
   const projectTitleByProjectKey = useMemo(

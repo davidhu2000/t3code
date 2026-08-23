@@ -1864,6 +1864,11 @@ export default function Sidebar() {
     () => sortLogicalProjectsForSidebar(unsortedProjectGroups, threads, sidebarProjectSortOrder),
     [sidebarProjectSortOrder, threads, unsortedProjectGroups],
   );
+  const projectScopeMenuGroups = useMemo(
+    () =>
+      projectGroups.toSorted((left, right) => left.displayName.localeCompare(right.displayName)),
+    [projectGroups],
+  );
   const serverConfigs = useAtomValue(environmentServerConfigsAtom);
   // Threads on non-primary environments (T3 Connect, hosted) resolve their
   // provider entry from their own environment's config: default instance ids
@@ -3513,7 +3518,7 @@ export default function Sidebar() {
                         <FolderIcon className="size-4 shrink-0" />
                         <span className="min-w-0 truncate text-sm">All projects</span>
                       </MenuRadioItem>
-                      {projectGroups.map((project) => {
+                      {projectScopeMenuGroups.map((project) => {
                         const scopeKey = project.projectKey;
                         return (
                           <MenuRadioItem
