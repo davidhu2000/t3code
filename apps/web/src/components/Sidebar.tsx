@@ -3521,7 +3521,7 @@ export default function Sidebar() {
                               environmentId={project.environmentId}
                               cwd={project.workspaceRoot}
                               faviconPath={project.faviconPath}
-                              className="size-4 shrink-0"
+                              className="-mx-0.5 size-4 shrink-0"
                             />
                             <span className="min-w-0 truncate text-sm">{project.displayName}</span>
                             <Button
