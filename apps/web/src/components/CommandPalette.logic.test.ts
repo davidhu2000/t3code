@@ -243,7 +243,7 @@ describe("buildThreadActionItems", () => {
     ]);
   });
 
-  it("preserves thread project-name matches when there is no stronger title match", () => {
+  it("preserves queries spanning thread and project search terms", () => {
     const group: CommandPaletteGroup = {
       value: "threads-search",
       label: "Threads",
@@ -262,7 +262,7 @@ describe("buildThreadActionItems", () => {
 
     const groups = filterCommandPaletteGroups({
       activeGroups: [group],
-      query: "project",
+      query: "spacing project",
       isInSubmenu: false,
       projectSearchItems: [],
       threadSearchItems: [],

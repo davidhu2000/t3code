@@ -338,7 +338,8 @@ export function filterCommandPaletteGroups(input: {
   return searchableGroups.flatMap((group) => {
     const items = Arr.filterMap(group.items, (item, index) => {
       const rank = rankCommandPaletteItemMatch(item, normalizedQuery);
-      if (rank === 0) {
+      const haystack = normalizeSearchText(item.searchTerms.join(" "));
+      if (rank === 0 && !haystack.includes(normalizedQuery)) {
         return Result.failVoid;
       }
 
