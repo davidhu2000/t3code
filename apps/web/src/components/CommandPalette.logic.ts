@@ -5,6 +5,7 @@ import {
 } from "@t3tools/contracts";
 import { filterFilesystemBrowseEntries } from "@t3tools/client-runtime/state/filesystem";
 import type { SidebarThreadSortOrder } from "@t3tools/contracts/settings";
+import { scoreSubsequenceMatch } from "@t3tools/shared/searchRanking";
 import * as Arr from "effect/Array";
 import * as Result from "effect/Result";
 import { type ReactNode } from "react";
@@ -257,7 +258,10 @@ export function buildThreadActionItems<TThread extends BuildThreadActionItemsThr
 
 function rankSearchFieldMatch(field: string, normalizedQuery: string): number {
   const normalizedField = normalizeSearchText(field);
-  if (normalizedField.length === 0 || !normalizedField.includes(normalizedQuery)) {
+  if (
+    normalizedField.length === 0 ||
+    scoreSubsequenceMatch(normalizedField, normalizedQuery) === null
+  ) {
     return Number.NEGATIVE_INFINITY;
   }
   if (normalizedField === normalizedQuery) {
@@ -333,15 +337,15 @@ export function filterCommandPaletteGroups(input: {
 
   return searchableGroups.flatMap((group) => {
     const items = Arr.filterMap(group.items, (item, index) => {
-      const haystack = normalizeSearchText(item.searchTerms.join(" "));
-      if (!haystack.includes(normalizedQuery)) {
+      const rank = rankCommandPaletteItemMatch(item, normalizedQuery);
+      if (rank === 0) {
         return Result.failVoid;
       }
 
       return Result.succeed({
         item,
         index,
-        rank: rankCommandPaletteItemMatch(item, normalizedQuery),
+        rank,
       });
     })
       .toSorted((left, right) => right.rank - left.rank || left.index - right.index)
