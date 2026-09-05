@@ -268,7 +268,11 @@ import { appendPreviewAnnotationPrompt } from "../lib/previewAnnotation";
 import { appendReviewCommentsToPrompt, type ReviewCommentContext } from "../reviewCommentContext";
 import { environmentCatalog } from "../connection/catalog";
 import { selectThreadTerminalUiState, useTerminalUiStateStore } from "../terminalUiStateStore";
-import { useKnownTerminalSessions, useThreadRunningTerminalIds } from "../state/terminalSessions";
+import {
+  selectTerminalIdsRequiringCloseConfirmation,
+  useKnownTerminalSessions,
+  useThreadRunningTerminalIds,
+} from "../state/terminalSessions";
 import { projectEnvironment } from "../state/projects";
 import { useEnvironmentQuery } from "../state/query";
 import {
@@ -849,10 +853,11 @@ const PersistentThreadTerminalDrawer = memo(function PersistentThreadTerminalDra
   );
   const runningTerminalIds = useMemo(
     () =>
-      drawerTerminalSessions
-        .filter((session) => session.state.hasRunningSubprocess)
-        .map((session) => session.target.terminalId),
-    [drawerTerminalSessions],
+      selectTerminalIdsRequiringCloseConfirmation(
+        terminalUiState.terminalIds,
+        drawerTerminalSessions,
+      ),
+    [drawerTerminalSessions, terminalUiState.terminalIds],
   );
   const terminalLabelsById = useMemo(() => {
     const next = new Map<string, string>();
@@ -1217,11 +1222,8 @@ const PersistentThreadTerminalPanel = memo(function PersistentThreadTerminalPane
     threadId: threadRef.threadId,
   });
   const runningTerminalIds = useMemo(
-    () =>
-      knownTerminalSessions
-        .filter((session) => session.state.hasRunningSubprocess)
-        .map((session) => session.target.terminalId),
-    [knownTerminalSessions],
+    () => selectTerminalIdsRequiringCloseConfirmation(surface.terminalIds, knownTerminalSessions),
+    [knownTerminalSessions, surface.terminalIds],
   );
   const threadWorktreePath = serverThread?.worktreePath ?? draftThread?.worktreePath ?? null;
   const activeSummary =

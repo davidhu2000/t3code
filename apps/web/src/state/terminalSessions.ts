@@ -121,6 +121,18 @@ export function selectKnownTerminalSessions(
   return sessions;
 }
 
+export function selectTerminalIdsRequiringCloseConfirmation(
+  terminalIds: ReadonlyArray<string>,
+  sessions: ReadonlyArray<KnownTerminalSession>,
+): ReadonlyArray<string> {
+  // Client-created terminal IDs can lead metadata, so only an explicit idle state skips confirmation.
+  return terminalIds.filter(
+    (terminalId) =>
+      sessions.find((session) => session.target.terminalId === terminalId)?.state
+        .hasRunningSubprocess !== false,
+  );
+}
+
 export function useAttachedTerminalSession(input: {
   readonly environmentId: EnvironmentId | null;
   readonly terminal: TerminalAttachInput | null;

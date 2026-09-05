@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import { EnvironmentId, ThreadId, type TerminalSummary } from "@t3tools/contracts";
 import { selectRunningSubprocessTerminalIds } from "@t3tools/client-runtime/state/terminal";
 
-import { selectKnownTerminalSessions } from "./terminalSessions";
+import {
+  selectKnownTerminalSessions,
+  selectTerminalIdsRequiringCloseConfirmation,
+} from "./terminalSessions";
 
 vi.mock("./terminal", () => ({ terminalEnvironment: {} }));
 
@@ -167,5 +170,19 @@ describe("selectKnownTerminalSessions", () => {
     }
     expect(selectKnownTerminalSessions(metadata, environmentA, null)).toHaveLength(source.length);
     expect(reads).toBe(source.length);
+  });
+});
+
+describe("selectTerminalIdsRequiringCloseConfirmation", () => {
+  it("keeps client-side terminals pending until metadata confirms they are idle", () => {
+    const sessions = selectKnownTerminalSessions(
+      [summary(threadA, "terminal-1", { hasRunningSubprocess: false })],
+      environmentA,
+      threadA,
+    );
+
+    expect(
+      selectTerminalIdsRequiringCloseConfirmation(["terminal-1", "terminal-new"], sessions),
+    ).toEqual(["terminal-new"]);
   });
 });
