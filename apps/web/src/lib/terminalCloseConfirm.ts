@@ -8,8 +8,8 @@ export function isTerminalCloseConfirmPending(): boolean {
 }
 
 /**
- * Confirmation for terminal close actions. Labels name only terminals with a
- * running subprocess; idle terminals close directly.
+ * Confirmation for terminal close actions. Labels exclude confirmed-idle
+ * terminals; running terminals and those awaiting metadata require confirmation.
  */
 export async function confirmTerminalClose(labels: readonly string[]): Promise<boolean> {
   if (labels.length === 0) return true;

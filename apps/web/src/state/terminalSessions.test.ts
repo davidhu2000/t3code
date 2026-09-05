@@ -2,10 +2,7 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import { EnvironmentId, ThreadId, type TerminalSummary } from "@t3tools/contracts";
 import { selectRunningSubprocessTerminalIds } from "@t3tools/client-runtime/state/terminal";
 
-import {
-  selectKnownTerminalSessions,
-  selectTerminalIdsRequiringCloseConfirmation,
-} from "./terminalSessions";
+import { selectKnownTerminalSessions, selectIdleTerminalIds } from "./terminalSessions";
 
 vi.mock("./terminal", () => ({ terminalEnvironment: {} }));
 
@@ -173,16 +170,20 @@ describe("selectKnownTerminalSessions", () => {
   });
 });
 
-describe("selectTerminalIdsRequiringCloseConfirmation", () => {
-  it("keeps client-side terminals pending until metadata confirms they are idle", () => {
-    const sessions = selectKnownTerminalSessions(
-      [summary(threadA, "terminal-1", { hasRunningSubprocess: false })],
-      environmentA,
-      threadA,
-    );
+describe("selectIdleTerminalIds", () => {
+  it("only permits skipping confirmation while metadata explicitly reports idle", () => {
+    const idle = summary(threadA, "terminal-idle", { hasRunningSubprocess: false });
+    const running = summary(threadA, "terminal-new");
+    const select = (metadata: TerminalSummary[]) =>
+      selectIdleTerminalIds(selectKnownTerminalSessions(metadata, environmentA, threadA));
 
-    expect(
-      selectTerminalIdsRequiringCloseConfirmation(["terminal-1", "terminal-new"], sessions),
-    ).toEqual(["terminal-new"]);
+    expect(select([])).toEqual([]);
+    expect(select([idle])).toEqual(["terminal-idle"]);
+    expect(select([idle, running])).toEqual(["terminal-idle"]);
+    expect(select([idle, { ...running, hasRunningSubprocess: false }])).toEqual([
+      "terminal-idle",
+      "terminal-new",
+    ]);
+    expect(select([idle, running])).toEqual(["terminal-idle"]);
   });
 });
