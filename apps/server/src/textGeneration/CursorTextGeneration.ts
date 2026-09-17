@@ -240,12 +240,7 @@ export const makeCursorTextGeneration = Effect.fn("makeCursorTextGeneration")(fu
 
   const generateThreadTitle: TextGeneration.TextGeneration["Service"]["generateThreadTitle"] =
     Effect.fn("CursorTextGeneration.generateThreadTitle")(function* (input) {
-      const { prompt, outputSchema } = buildThreadTitlePrompt({
-        message: input.message,
-        previousTitle: input.previousTitle,
-        linkedContext: input.linkedContext,
-        attachments: input.attachments,
-      });
+      const { prompt, outputSchema } = buildThreadTitlePrompt(input);
 
       const generated = yield* runCursorJson({
         operation: "generateThreadTitle",

@@ -13,6 +13,12 @@ an existing worktree, use **New thread in this worktree** from the branch toolba
 When you change a new thread's project, T3 Code stays in the current environment
 if that project exists there. Otherwise it selects an environment that has it.
 
+To customize generated titles, open **Settings → General → Text generation** on
+web or desktop and set **Thread title instructions** for the selected environments. Instructions
+apply to new titles and **Regenerate title** on those environments, including mobile
+threads. Clear the field to restore the default style; existing titles stay unchanged
+until you regenerate them.
+
 ### Start in the background
 
 In a desktop browser or the desktop app, press `Cmd+Enter` on macOS or `Ctrl+Enter`
