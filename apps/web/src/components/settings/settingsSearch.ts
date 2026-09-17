@@ -433,6 +433,7 @@ export const SETTINGS_SEARCH_ITEMS = [
     id: "thread-title-instructions",
     title: "Thread title instructions",
     to: "/settings/general",
+    scope: "environment-defaults",
     searchTerms: ["custom prompt generated names naming style regenerate text generation"],
   },
   {
