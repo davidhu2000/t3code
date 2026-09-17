@@ -391,7 +391,13 @@ export const makeAntigravityTextGeneration = Effect.fn("makeAntigravityTextGener
     Effect.fn("AntigravityTextGeneration.generateThreadTitle")(function* (input) {
       const generated = yield* runAntigravityJson({
         operation: "generateThreadTitle",
-        ...buildThreadTitlePrompt(input),
+        ...buildThreadTitlePrompt({
+          message: input.message,
+          previousTitle: input.previousTitle,
+          linkedContext: input.linkedContext,
+          attachments: input.attachments,
+          policy: input.policy,
+        }),
         modelSelection: input.modelSelection,
       });
       return {

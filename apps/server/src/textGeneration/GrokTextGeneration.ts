@@ -242,7 +242,13 @@ export const makeGrokTextGeneration = Effect.fn("makeGrokTextGeneration")(functi
 
   const generateThreadTitle: TextGeneration.TextGeneration["Service"]["generateThreadTitle"] =
     Effect.fn("GrokTextGeneration.generateThreadTitle")(function* (input) {
-      const { prompt, outputSchema } = buildThreadTitlePrompt(input);
+      const { prompt, outputSchema } = buildThreadTitlePrompt({
+        message: input.message,
+        previousTitle: input.previousTitle,
+        linkedContext: input.linkedContext,
+        attachments: input.attachments,
+        policy: input.policy,
+      });
 
       const generated = yield* runGrokJson({
         operation: "generateThreadTitle",

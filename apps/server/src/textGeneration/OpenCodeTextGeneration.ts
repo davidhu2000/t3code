@@ -432,7 +432,13 @@ export const makeOpenCodeTextGeneration = Effect.fn("makeOpenCodeTextGeneration"
 
   const generateThreadTitle: TextGeneration.TextGeneration["Service"]["generateThreadTitle"] =
     Effect.fn("OpenCodeTextGeneration.generateThreadTitle")(function* (input) {
-      const { prompt, outputSchema } = buildThreadTitlePrompt(input);
+      const { prompt, outputSchema } = buildThreadTitlePrompt({
+        message: input.message,
+        previousTitle: input.previousTitle,
+        linkedContext: input.linkedContext,
+        attachments: input.attachments,
+        policy: input.policy,
+      });
       const generated = yield* runOpenCodeJson({
         operation: "generateThreadTitle",
         cwd: input.cwd,
