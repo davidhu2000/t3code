@@ -194,28 +194,26 @@ function buildChart(
   metric: UsageChartMetric,
   providers: readonly UsageProviderKind[],
   loadingProviders: ReadonlySet<UsageProviderKind>,
-  lastInProgress: boolean,
 ) {
   const columns = buildPeriodColumns(periods, byPeriod, metric);
   const scale = chartScale(columns, loadingProviders);
   const stepX = periods.length < 2 ? 0 : VIEW_WIDTH / (periods.length - 1);
   const paths = providers.map((provider) => {
     const slot = PROVIDER_ORDER.indexOf(provider);
-    const segments = smoothCurve(
-      columns.map((column, periodIndex) => ({
-        x: periodIndex * stepX,
-        y: valueToY(column.bands[slot]?.value ?? 0, scale.max),
-      })),
+    const line = curvePath(
+      smoothCurve(
+        columns.map((column, periodIndex) => ({
+          x: periodIndex * stepX,
+          y: valueToY(column.bands[slot]?.value ?? 0, scale.max),
+        })),
+      ),
     );
-    // The segment into a period in progress is drawn dotted, since its value can still rise.
-    const settled = lastInProgress ? segments.slice(0, -1) : segments;
     return {
       provider,
       loading: loadingProviders.has(provider),
       total: columns.reduce((sum, column) => sum + (column.bands[slot]?.value ?? 0), 0),
-      line: curvePath(settled),
-      pendingLine: curvePath(segments.slice(settled.length)),
-      area: areaPath(curvePath(segments)),
+      line,
+      area: areaPath(line),
     };
   });
 
@@ -431,7 +429,6 @@ export function UsageProviderChart({
     metric,
     providers,
     loadingProviders,
-    latestHour !== undefined,
   );
 
   const toY = (value: number) => valueToY(value, scale.max);
@@ -498,24 +495,16 @@ export function UsageProviderChart({
               fillOpacity={0.12}
             />
           ))}
-          {paths.map(({ provider, loading, line, pendingLine }) => (
-            <g
+          {paths.map(({ provider, loading, line }) => (
+            <path
               key={provider}
+              d={line}
               className={seriesClassName(loading)}
               fill="none"
               stroke={PROVIDER_PRESENTATION[provider].color}
               strokeWidth={2}
-            >
-              <path d={line} vectorEffect="non-scaling-stroke" />
-              {pendingLine === "" ? null : (
-                <path
-                  d={pendingLine}
-                  strokeDasharray="1 5"
-                  strokeLinecap="round"
-                  vectorEffect="non-scaling-stroke"
-                />
-              )}
-            </g>
+              vectorEffect="non-scaling-stroke"
+            />
           ))}
         </UsageChartPlot>
       </div>
